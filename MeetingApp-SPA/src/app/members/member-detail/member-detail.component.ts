@@ -42,12 +42,12 @@ getImages() {
 
   for (let i = 0; i < this.user.photos.length; i++)
   {
-  imageUrls.push({
-small: this.user.photos[i].url,
-medium: this.user.photos[i].url,
-big: this.user.photos[i].url,
-description:this.user.photos[i].description
-  });
+   imageUrls.push({
+    small: this.user.photos[i].url,
+    medium: this.user.photos[i].url,
+    big: this.user.photos[i].url,
+    description: this.user.photos[i].description,
+    });
   }
   return imageUrls;
 }
