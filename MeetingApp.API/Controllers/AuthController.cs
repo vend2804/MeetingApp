@@ -3,6 +3,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using MeetingApp.API.Data;
 using MeetingApp.API.Dtos;
 using MeetingApp.API.Models;
@@ -13,13 +14,15 @@ using Microsoft.IdentityModel.Tokens;
 namespace MeetingApp.API.Controllers
 {
     [Route("api/[controller]")]
-     [ApiController]
+    [ApiController]
     public class AuthController : ControllerBase
     {
         private readonly IAuthRepository _repo;
         private readonly IConfiguration _config;
-        public AuthController(IAuthRepository repo, IConfiguration config)
+        private readonly IMapper _mapper;
+        public AuthController(IAuthRepository repo, IConfiguration config, IMapper mapper)
         {
+            _mapper = mapper;
             _config = config;
             _repo = repo;
 
@@ -66,24 +69,29 @@ namespace MeetingApp.API.Controllers
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
-                var tokenDescriptor = new SecurityTokenDescriptor {
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
 
                 Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.Now.AddDays(1),
                 SigningCredentials = creds
 
-                };
+            };
 
-                var tokenHandler= new JwtSecurityTokenHandler();
-                var token =tokenHandler.CreateToken(tokenDescriptor);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
 
-                return Ok(new {
-                token= tokenHandler.WriteToken(token)
-                });
+            var user = _mapper.Map<UserForListDto>(userFromRepo);
+
+            return Ok(new
+            {
+                token = tokenHandler.WriteToken(token),
+                user
+            });
 
 
 
         }
 
-     }
+    }
 }
